@@ -10,16 +10,18 @@ namespace RestApi.Controllers
     public class CityController : ControllerBase
     {
         private readonly ILogger<CityController> _logger;
+        private readonly CityDataStore _cityDataStore;
 
-        public CityController(ILogger<CityController> logger)
+        public CityController(ILogger<CityController> logger, CityDataStore cityDataStore)
         {
             _logger = logger;
+            _cityDataStore = cityDataStore;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var cities = CityDataStore.Cities;
+            var cities = _cityDataStore.Cities;
             if(cities.Count == 0)
             {
                 _logger.LogInformation($"No city data found");
@@ -31,7 +33,7 @@ namespace RestApi.Controllers
         [HttpGet("{cityId}")]
         public IActionResult Get(int cityId) 
         {
-            var cities = CityDataStore.Cities.FirstOrDefault(c => c.Id.Equals(cityId));
+            var cities = _cityDataStore.Cities.FirstOrDefault(c => c.Id.Equals(cityId));
             if(cities == null)
             {
                 _logger.LogInformation($"City with Id: {cityId} not found");
@@ -43,7 +45,7 @@ namespace RestApi.Controllers
         [HttpPut("{cityId}")]
         public IActionResult Put(int cityId, CityDtoEdit city) 
         {
-            var cities = CityDataStore.Cities.FirstOrDefault(c => c.Id.Equals(cityId));
+            var cities = _cityDataStore.Cities.FirstOrDefault(c => c.Id.Equals(cityId));
             if (cities == null)
             {
                 _logger.LogInformation($"City with Id: {cityId} not found");
@@ -63,13 +65,13 @@ namespace RestApi.Controllers
         [HttpDelete("{cityId}")]
         public IActionResult Delete(int cityId) 
         {
-            var cities = CityDataStore.Cities.FirstOrDefault(c => c.Id.Equals(cityId));
+            var cities = _cityDataStore.Cities.FirstOrDefault(c => c.Id.Equals(cityId));
             if (cities == null)
             {
                 _logger.LogInformation($"City with Id: {cityId} not found");
                 return NotFound();
             }
-            CityDataStore.Cities.Remove(cities);
+            _cityDataStore.Cities.Remove(cities);
             _logger.LogInformation("City has been successfully removed");
             return NoContent();
         }
